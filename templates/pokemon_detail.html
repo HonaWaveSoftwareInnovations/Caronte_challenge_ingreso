@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container py-4">
-  <!-- Este h1 es el que busca el test -->
+  <!-- TÍTULO PRINCIPAL: el test busca este <h1> -->
   <h1 class="text-capitalize">{{ pokemon.name }}</h1>
 
   <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-3">
@@ -22,7 +22,9 @@
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <h2 class="card-title">Detalle de {{ pokemon.name|capfirst }}</h2>
+          <h2 class="card-title">
+            Detalle de {{ pokemon.name|capfirst }}
+          </h2>
           <dl class="row">
             <dt class="col-sm-4">Stats</dt>
             <dd class="col-sm-8">
