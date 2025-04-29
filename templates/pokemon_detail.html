@@ -1,45 +1,76 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ pokemon.name|capfirst }}</title>
-  <style>
-    body { font-family: sans-serif; max-width: 800px; margin: auto; }
-    img { display: block; margin-bottom: 20px; }
-    h2 { margin-top: 30px; }
-  </style>
-</head>
-<body>
-  <a href="{% url 'home' %}">&larr; Volver a la lista</a>
-  <h1>{{ pokemon.name|capfirst }}</h1>
-  <img src="{{ pokemon.sprites.front_default }}" alt="{{ pokemon.name }}">
+{% extends "base.html" %}
 
-  <h2>Stats</h2>
-  <ul>
-    {% for s in pokemon.stats %}
-      <li>{{ s.stat.name|capfirst }}: {{ s.base_stat }}</li>
-    {% endfor %}
-  </ul>
+{% block title %}{{ pokemon.name|capfirst }}{% endblock %}
 
-  <h2>Tipos</h2>
-  <ul>
-    {% for t in pokemon.types %}
-      <li>{{ t.type.name|capfirst }}</li>
-    {% endfor %}
-  </ul>
+{% block content %}
+<div class="container py-4">
+  <a
+    href="{% url 'home' %}"
+    class="btn btn-outline-secondary mb-3"
+  >&larr; Volver a la lista</a>
 
-  <h2>Habilidades</h2>
-  <ul>
-    {% for a in pokemon.abilities %}
-      <li>{{ a.ability.name|capfirst }}</li>
-    {% endfor %}
-  </ul>
+  <!-- Título principal necesario para el test -->
+  <h1 class="text-capitalize">{{ pokemon.name }}</h1>
 
-  <h2>Movimientos</h2>
-  <ul>
-    {% for m in pokemon.moves %}
-      <li>{{ m.move.name|capfirst }}</li>
-    {% endfor %}
-  </ul>
-</body>
-</html>
+  <div class="card mb-4 shadow-sm">
+    <div class="row g-0">
+      <div class="col-md-4 text-center p-4">
+        <img
+          src="{{ pokemon.sprites.front_default }}"
+          class="img-fluid"
+          alt="{{ pokemon.name }}"
+        >
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h2 class="card-title text-capitalize">
+            Detalle de {{ pokemon.name }}
+          </h2>
+          <dl class="row">
+            <dt class="col-sm-4">Stats</dt>
+            <dd class="col-sm-8">
+              <ul class="list-unstyled mb-0">
+                {% for s in pokemon.stats %}
+                  <li>
+                    {{ s.stat.name|capfirst }}:
+                    {{ s.base_stat }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </dd>
+
+            <dt class="col-sm-4">Tipos</dt>
+            <dd class="col-sm-8">
+              {% for t in pokemon.types %}
+                <span class="badge bg-success text-capitalize me-1">
+                  {{ t.type.name }}
+                </span>
+              {% endfor %}
+            </dd>
+
+            <dt class="col-sm-4">Habilidades</dt>
+            <dd class="col-sm-8">
+              <ul class="mb-0">
+                {% for a in pokemon.abilities %}
+                  <li>{{ a.ability.name|capfirst }}</li>
+                {% endfor %}
+              </ul>
+            </dd>
+
+            <dt class="col-sm-4">Movimientos</dt>
+            <dd class="col-sm-8">
+              <div style="max-height:200px; overflow:auto;">
+                <ul class="list-unstyled mb-0">
+                  {% for m in pokemon.moves %}
+                    <li class="text-capitalize">{{ m.move.name }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
