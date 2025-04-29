@@ -1,12 +1,11 @@
 # api/urls.py
-from django.urls import path
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from .views import PokemonViewSet
 
-class HelloView(APIView):
-    def get(self, request):
-        return Response({"message": "¡DRF funcionando!"})
+router = DefaultRouter()
+router.register(r'pokemon', PokemonViewSet, basename='pokemon')
 
 urlpatterns = [
-    path('hello/', HelloView.as_view(), name='hello'),
+    path('', include(router.urls)),
 ]
