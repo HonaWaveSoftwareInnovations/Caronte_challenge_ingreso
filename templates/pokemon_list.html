@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokédex</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; }
+    img { vertical-align: middle; }
+    .pokemon-item { margin: 10px 0; }
+    .pagination { margin-top: 20px; }
+    .pagination a { margin: 0 5px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Pokédex</h1>
+
+  <form method="get">
+    <input type="text" name="search" placeholder="Buscar Pokémon..." value="{{ search }}">
+    <button type="submit">Buscar</button>
+  </form>
+
+  <div>
+    {% if pokemons %}
+      {% for p in pokemons %}
+        <div class="pokemon-item">
+          <img src="{{ p.sprite }}" width="50" alt="{{ p.name }}">
+          <a href="{% url 'detail' p.name %}">{{ p.name|capfirst }}</a>
+          - Habilidades: {{ p.abilities_count }}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No se encontraron Pokémon.</p>
+    {% endif %}
+  </div>
+
+  <div class="pagination">
+    {% if prev_page %}
+      <a href="?page={{ prev_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}">&laquo; Anterior</a>
+    {% endif %}
+    Página {{ page }} de {{ total_pages }}
+    {% if next_page %}
+      <a href="?page={{ next_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}">Siguiente &raquo;</a>
+    {% endif %}
+  </div>
+</body>
+</html>
