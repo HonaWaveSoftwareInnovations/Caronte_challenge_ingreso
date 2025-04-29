@@ -1,46 +1,101 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Pokédex</title>
-  <style>
-    body { font-family: sans-serif; max-width: 800px; margin: auto; }
-    img { vertical-align: middle; }
-    .pokemon-item { margin: 10px 0; }
-    .pagination { margin-top: 20px; }
-    .pagination a { margin: 0 5px; text-decoration: none; }
-  </style>
-</head>
-<body>
-  <h1>Pokédex</h1>
+{% extends "base.html" %}
 
-  <form method="get">
-    <input type="text" name="search" placeholder="Buscar Pokémon..." value="{{ search }}">
-    <button type="submit">Buscar</button>
+{% block title %}Pokédex{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Pokédex</h1>
+
+  <form method="get" class="row g-2 mb-4">
+    <div class="col">
+      <input
+        type="text"
+        name="search"
+        class="form-control"
+        placeholder="Buscar Pokémon..."
+        value="{{ search }}"
+      >
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
   </form>
 
-  <div>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {% if pokemons %}
       {% for p in pokemons %}
-        <div class="pokemon-item">
-          <img src="{{ p.sprite }}" width="50" alt="{{ p.name }}">
-          <a href="{% url 'detail' p.name %}">{{ p.name|capfirst }}</a>
-          - Habilidades: {{ p.abilities_count }}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img
+              src="{{ p.sprite }}"
+              class="card-img-top"
+              alt="{{ p.name }}"
+            >
+            <div class="card-body">
+              <h5 class="card-title text-capitalize">
+                <a
+                  href="{% url 'detail' p.name %}"
+                  class="stretched-link text-decoration-none"
+                >
+                  {{ p.name }}
+                </a>
+              </h5>
+              <p class="card-text">
+                Habilidades: {{ p.abilities_count }}
+              </p>
+            </div>
+          </div>
         </div>
       {% endfor %}
     {% else %}
-      <p>No se encontraron Pokémon.</p>
+      <div class="col-12">
+        <div class="alert alert-warning text-center">
+          No se encontraron Pokémon.
+        </div>
+      </div>
     {% endif %}
   </div>
 
-  <div class="pagination">
-    {% if prev_page %}
-      <a href="?page={{ prev_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}">&laquo; Anterior</a>
-    {% endif %}
-    Página {{ page }} de {{ total_pages }}
-    {% if next_page %}
-      <a href="?page={{ next_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}">Siguiente &raquo;</a>
-    {% endif %}
-  </div>
-</body>
-</html>
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if prev_page %}
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="?page={{ prev_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}"
+            aria-label="Anterior"
+          >
+            &laquo; Anterior
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo; Anterior</span>
+        </li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link">
+          Página {{ page }} de {{ total_pages }}
+        </span>
+      </li>
+
+      {% if next_page %}
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="?page={{ next_page }}&page_size={{ page_size }}{% if search %}&search={{ search }}{% endif %}"
+            aria-label="Siguiente"
+          >
+            Siguiente &raquo;
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Siguiente &raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}
