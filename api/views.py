@@ -1,9 +1,13 @@
+# api/views.py
+
 from django.shortcuts import render
 from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from api.services.pokeapi import fetch_pokemon_list, fetch_pokemon_detail
+
+import api.services.pokeapi as pokeapi
 from .serializers import PokemonListSerializer, PokemonDetailSerializer
+
 
 class PokemonViewSet(viewsets.ViewSet):
     """
@@ -11,12 +15,12 @@ class PokemonViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
+        # Soporta búsqueda exacta con param 'search'
         search_query = request.query_params.get('search')
         if search_query:
             url = f"{settings.POKEAPI_BASE_URL}/pokemon/{search_query.lower()}"
             try:
-                detail = fetch_pokemon_detail(url)
-                # Construimos el item dentro del try para capturar KeyError, etc.
+                detail = pokeapi.fetch_pokemon_detail(url)
                 item = {
                     'name': detail['name'],
                     'url': url,
@@ -24,7 +28,6 @@ class PokemonViewSet(viewsets.ViewSet):
                     'abilities_count': len(detail['abilities']),
                 }
             except Exception:
-                # Cualquier fallo aquí se considera “no encontrado”
                 return Response({
                     'count': 0,
                     'next': None,
@@ -39,21 +42,16 @@ class PokemonViewSet(viewsets.ViewSet):
                 'previous': None,
                 'results': serializer.data
             })
-        
-        # …el resto de tu lógica de paginación…
 
-
-        # Si no hay búsqueda, paginación manual
+        # Paginación manual
         page = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('page_size', 10))
         offset = (page - 1) * page_size
 
-        data = fetch_pokemon_list(offset=offset, limit=page_size)
-
-        # Construir lista enriquecida
+        data = pokeapi.fetch_pokemon_list(offset=offset, limit=page_size)
         enriched = []
         for item in data['results']:
-            detail = fetch_pokemon_detail(item['url'])
+            detail = pokeapi.fetch_pokemon_detail(item['url'])
             enriched.append({
                 'name': item['name'],
                 'url': item['url'],
@@ -70,10 +68,9 @@ class PokemonViewSet(viewsets.ViewSet):
         })
 
     def retrieve(self, request, pk=None):
-        # pk es el nombre o id; usamos el nombre
         url = f"{settings.POKEAPI_BASE_URL}/pokemon/{pk}"
         try:
-            detail = fetch_pokemon_detail(url)
+            detail = pokeapi.fetch_pokemon_detail(url)
         except Exception:
             return Response(
                 {'detail': 'Pokémon no encontrado.'},
@@ -95,7 +92,7 @@ def index(request):
 
     if search:
         try:
-            detail = fetch_pokemon_detail(
+            detail = pokeapi.fetch_pokemon_detail(
                 f"{settings.POKEAPI_BASE_URL}/pokemon/{search.lower()}"
             )
             pokemons = [{
@@ -111,10 +108,10 @@ def index(request):
             total_pages = 1
     else:
         offset = (page - 1) * page_size
-        data = fetch_pokemon_list(offset=offset, limit=page_size)
+        data = pokeapi.fetch_pokemon_list(offset=offset, limit=page_size)
         pokemons = []
         for item in data['results']:
-            d = fetch_pokemon_detail(item['url'])
+            d = pokeapi.fetch_pokemon_detail(item['url'])
             pokemons.append({
                 'name': item['name'],
                 'sprite': d['sprites']['front_default'],
@@ -136,12 +133,13 @@ def index(request):
         'next_page': next_page,
     })
 
+
 def detail_view(request, name):
     """
     Renderiza el perfil completo de un Pokémon.
     """
     try:
-        pokemon = fetch_pokemon_detail(
+        pokemon = pokeapi.fetch_pokemon_detail(
             f"{settings.POKEAPI_BASE_URL}/pokemon/{name.lower()}"
         )
     except Exception:
