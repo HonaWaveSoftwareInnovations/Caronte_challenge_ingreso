@@ -11,13 +11,20 @@ class PokemonViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
-        # Soporta búsqueda exacta con param 'search'
         search_query = request.query_params.get('search')
         if search_query:
             url = f"{settings.POKEAPI_BASE_URL}/pokemon/{search_query.lower()}"
             try:
                 detail = fetch_pokemon_detail(url)
+                # Construimos el item dentro del try para capturar KeyError, etc.
+                item = {
+                    'name': detail['name'],
+                    'url': url,
+                    'sprite': detail['sprites']['front_default'],
+                    'abilities_count': len(detail['abilities']),
+                }
             except Exception:
+                # Cualquier fallo aquí se considera “no encontrado”
                 return Response({
                     'count': 0,
                     'next': None,
@@ -25,12 +32,6 @@ class PokemonViewSet(viewsets.ViewSet):
                     'results': []
                 }, status=status.HTTP_200_OK)
 
-            item = {
-                'name': detail['name'],
-                'url': url,
-                'sprite': detail['sprites']['front_default'],
-                'abilities_count': len(detail['abilities']),
-            }
             serializer = PokemonListSerializer([item], many=True)
             return Response({
                 'count': 1,
@@ -38,6 +39,9 @@ class PokemonViewSet(viewsets.ViewSet):
                 'previous': None,
                 'results': serializer.data
             })
+        
+        # …el resto de tu lógica de paginación…
+
 
         # Si no hay búsqueda, paginación manual
         page = int(request.query_params.get('page', 1))
