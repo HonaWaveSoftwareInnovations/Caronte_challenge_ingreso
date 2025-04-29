@@ -4,13 +4,12 @@
 
 {% block content %}
 <div class="container py-4">
-  <a
-    href="{% url 'home' %}"
-    class="btn btn-outline-secondary mb-3"
-  >&larr; Volver a la lista</a>
-
-  <!-- Título principal necesario para el test -->
+  <!-- Este h1 es el que busca el test -->
   <h1 class="text-capitalize">{{ pokemon.name }}</h1>
+
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-3">
+    &larr; Volver a la lista
+  </a>
 
   <div class="card mb-4 shadow-sm">
     <div class="row g-0">
@@ -23,18 +22,13 @@
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <h2 class="card-title text-capitalize">
-            Detalle de {{ pokemon.name }}
-          </h2>
+          <h2 class="card-title">Detalle de {{ pokemon.name|capfirst }}</h2>
           <dl class="row">
             <dt class="col-sm-4">Stats</dt>
             <dd class="col-sm-8">
-              <ul class="list-unstyled mb-0">
+              <ul class="list-unstyled">
                 {% for s in pokemon.stats %}
-                  <li>
-                    {{ s.stat.name|capfirst }}:
-                    {{ s.base_stat }}
-                  </li>
+                  <li>{{ s.stat.name|capfirst }}: {{ s.base_stat }}</li>
                 {% endfor %}
               </ul>
             </dd>
@@ -50,7 +44,7 @@
 
             <dt class="col-sm-4">Habilidades</dt>
             <dd class="col-sm-8">
-              <ul class="mb-0">
+              <ul>
                 {% for a in pokemon.abilities %}
                   <li>{{ a.ability.name|capfirst }}</li>
                 {% endfor %}
@@ -58,14 +52,12 @@
             </dd>
 
             <dt class="col-sm-4">Movimientos</dt>
-            <dd class="col-sm-8">
-              <div style="max-height:200px; overflow:auto;">
-                <ul class="list-unstyled mb-0">
-                  {% for m in pokemon.moves %}
-                    <li class="text-capitalize">{{ m.move.name }}</li>
-                  {% endfor %}
-                </ul>
-              </div>
+            <dd class="col-sm-8" style="max-height:200px; overflow:auto;">
+              <ul class="list-unstyled">
+                {% for m in pokemon.moves %}
+                  <li class="text-capitalize">{{ m.move.name }}</li>
+                {% endfor %}
+              </ul>
             </dd>
           </dl>
         </div>
